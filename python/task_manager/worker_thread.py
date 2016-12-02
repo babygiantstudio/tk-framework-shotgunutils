@@ -13,6 +13,7 @@ Worker thread for the background manager.
 """
 
 import traceback
+import sgtk
 from sgtk.platform.qt import QtCore
 
 
@@ -36,6 +37,8 @@ class WorkerThread(QtCore.QThread):
         self._mutex = QtCore.QMutex()
         self._wait_condition = QtCore.QWaitCondition()
         self._results_dispatcher = results_dispatcher
+        self._current_task = None
+        self._current_bundle = sgtk.platform.current_bundle()
 
     def run_task(self, task):
         """
@@ -61,7 +64,11 @@ class WorkerThread(QtCore.QThread):
         finally:
             self._mutex.unlock()
         self._wait_condition.wakeAll()
-        self.wait()
+
+        if self._current_task:
+            self._current_bundle.log_debug("Task '%s' was running at shutdown." % self._current_task)
+        # Do not wait for the background thread while we figure out what is wrong at Brown Bag Films.
+        # self.wait()
 
     def run(self):
         """
@@ -87,6 +94,7 @@ class WorkerThread(QtCore.QThread):
 
             # run the task:
             try:
+                self._current_task = task_to_process
                 result = task_to_process.run()
 
                 self._mutex.lock()
