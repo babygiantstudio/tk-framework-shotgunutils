@@ -96,6 +96,7 @@ class WorkerThread(QtCore.QThread):
             try:
                 self._current_task = task_to_process
                 result = task_to_process.run()
+                self._current_task = None
 
                 self._mutex.lock()
                 try:
