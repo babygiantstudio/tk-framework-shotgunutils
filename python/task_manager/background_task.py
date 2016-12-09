@@ -87,7 +87,10 @@ class BackgroundTask(object):
         Create a string representation of this instance
         :returns:   A string representation of this instance
         """
-        return "[%d, G:%s, P:%s] %s" % (self._uid, self._group, self._priority, self._cbl.__name__)
+        return "[%d, G:%s, P:%s] %s {\n"\
+               "    args: %s\n"\
+               "    kwargs: %s\n"\
+               "}" % (self._uid, self._group, self._priority, self._cbl.__name__, self._args, self._kwargs)
 
     @property
     def uid(self):

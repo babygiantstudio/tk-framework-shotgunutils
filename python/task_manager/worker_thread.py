@@ -57,6 +57,8 @@ class WorkerThread(QtCore.QThread):
         """
         Shut down the thread and wait for it to exit before returning
         """
+        if self._current_task:
+            self._current_bundle.log_debug("Task '%s' was running at shutdown." % self._current_task)
         self._results_dispatcher = None
         self._mutex.lock()
         try:
@@ -64,9 +66,6 @@ class WorkerThread(QtCore.QThread):
         finally:
             self._mutex.unlock()
         self._wait_condition.wakeAll()
-
-        if self._current_task:
-            self._current_bundle.log_debug("Task '%s' was running at shutdown." % self._current_task)
         # Do not wait for the background thread while we figure out what is wrong at Brown Bag Films.
         # self.wait()
 
